@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef pair<ll, ll> pll;
+const ll MX = 1010101;
+const ll INF = 9e15;
+ll tree[MX], n, m, k;
+ll sum(ll i) {
+	ll ans = 0;
+	while (i) {
+		ans += tree[i];
+		i -= i & -i;
+	}
+	return ans;
+}
+void upd(ll i, ll diff) {
+	while (i <= n) {
+		tree[i] += diff;
+		i += i & -i;
+	}
+}
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> n >> m >> k;
+
+	for (int i = 1; i <= n; i++) {
+		ll x;
+		cin >> x;
+		upd(i, x);
+	}
+	
+	m += k;
+	while (m--) {
+		ll cmd, x, y;
+		cin >> cmd >> x >> y;
+		if (cmd == 1) {
+			ll z = sum(x) - sum(x-1);
+			upd(x, y - z);
+		}
+		else {
+			cout << sum(y) - sum(x - 1) << "\n";
+		}
+	}
+}
