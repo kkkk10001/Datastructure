@@ -1,0 +1,54 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef pair<ll, ll> pll;
+#define all(v) v.begin(), v.end()
+const ll MX = 101010;
+const ll INF = 9e15;
+vector<ll> tree[MX * 4 + 5];
+const ll sz = 1 << 17;
+ll n, a[MX], Q;
+void add(ll x, ll y) {
+	x += sz - 1;
+	tree[x].push_back(y);
+}
+void build() {
+	for (int i = 1; i <= n; i++) {
+		add(i, a[i]);
+	}
+	for (int i = sz - 1; i; i--) {
+		tree[i].resize(tree[i * 2].size() + tree[i * 2 + 1].size());
+		merge(all(tree[i * 2]), all(tree[i * 2 + 1]), tree[i].begin());
+	}
+}
+ll foo(ll L, ll R, ll node, ll nodeL, ll nodeR, ll val) {
+	if (nodeL > R || nodeR < L) return 0;
+	if (nodeL >= L && nodeR <= R) {
+		return tree[node].end() - upper_bound(all(tree[node]), val);
+	}
+	ll mid = (nodeL + nodeR) / 2;
+	return foo(L, R, node * 2, nodeL, mid, val) + foo(L, R, node * 2 + 1, mid + 1, nodeR, val);
+}
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> n;
+	for (int i = 1; i <= n; i++) {
+		cin >> a[i];
+	}
+	build();
+	cin >> Q;
+	ll ans = 0;
+	while (Q--) {
+		ll x, y, z;
+		cin >> x >> y >> z;
+		x ^= ans;
+		y ^= ans;
+		z ^= ans;
+		if(x > y) swap(x, y);
+		ans = foo(x, y, 1, 1, sz, z);
+		cout << ans << "\n";
+	}
+}
