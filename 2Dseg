@@ -1,0 +1,75 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef pair<ll, ll> pll;
+#define all(v) v.begin(), v.end()
+const ll MX = 1555;
+const ll INF = 9e15;
+vector<vector<ll> > tree;
+ll N, Q, a[MX][MX], n = 1522;
+void init() {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			tree[i + n][j + n] = a[i][j];
+		}
+	}
+
+	for(int i = n; i < 2 * n; i++) { // 리프노드
+		for (int j = n - 1; j > 0; j--) tree[i][j] = max(tree[i][j << 1], tree[i][j << 1 | 1]);
+	}
+
+	for (int i = n - 1; i > 0; i--) {
+		for (int j = 1; j < 2 * n; j++) {
+			tree[i][j] = max(tree[i << 1][j],tree[i << 1 | 1][j]);
+		}
+	}
+
+}
+ll query1D(ll x, ll y1, ll y2) {
+	ll ret = 0;
+	for (y1 += n, y2 += n; y1 <= y2; y1 >>= 1, y2 >>= 1) {
+		if (y1 & 1) ret = max(ret, tree[x][y1++]);
+		if (!(y2 & 1)) ret = max(ret, tree[x][y2--]);
+	}
+	return ret;
+}
+ll query(ll x1, ll y1, ll x2, ll y2) {
+	ll ret = 0;
+	for (x1 += n, x2 += n; x1 <= x2; x1 >>= 1, x2 >>= 1) {
+		if (x1 & 1) ret = max(ret, query1D(x1++, y1, y2));
+		if (!(x2 & 1)) ret = max(ret, query1D(x2--, y1, y2));
+	}
+	return ret;
+}
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	tree.resize(3333);
+	for (int i = 1; i < tree.size(); i++) {
+		tree[i].resize(3333);
+	}
+	cin >> N >> Q;
+	for (int i = 1; i <= N; i++) {
+		ll y1, x1, y2, x2;
+		cin >> y1 >> x1 >> y2 >> x2;
+		y1++, x1++;
+		a[y1][x1]++;
+		a[y2 + 1][x2 + 1]++;
+		a[y2 + 1][x1]--;
+		a[y1][x2 + 1]--;
+	}
+	for (int i = 1; i <= 1501; i++) {
+		for (int j = 1; j <= 1501; j++) {
+			a[i][j] += a[i - 1][j] + a[i][j - 1] - a[i - 1][j - 1];
+		}
+	}
+	init();
+	for (int i = 1; i <= Q; i++) {
+		ll x1, y1, x2, y2;
+		cin >> x1 >> y1 >> x2 >> y2;
+		x1++, y1++;
+		cout << query(x1, y1, x2, y2) << "\n";
+	}
+}
