@@ -23,7 +23,7 @@ public:
 };
 void Queue::push(int value)
 {
-	if ((rear + 1) % maxSize == front % maxSize) {
+	if (full()) {
 		cout << "Queue is full" << endl;
 		return;
 	}
@@ -33,11 +33,11 @@ void Queue::push(int value)
 void Queue::pop()
 {
 	data[front++] = -1;
+	if (front >= maxSize) front %= maxSize;
 }
 
 int Queue::GetFront()
 {
-	if (front >= maxSize) front %= maxSize;
 	return data[front];
 }
 int Queue::GetSize()
@@ -56,10 +56,10 @@ int main()
 {
 	Queue qu(10);
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 11; i++) {
 		qu.push(i);
 	}
-	while(qu.GetSize() > 0) 
+	while (qu.GetSize() > 0)
 	{
 		cout << qu.GetFront() << "\n";
 		qu.pop();
